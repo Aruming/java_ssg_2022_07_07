@@ -7,7 +7,8 @@ public class App {
         System.out.println("== 명언 SSG ==");
 
         Scanner sc = new Scanner(System.in);
-        int num=1;
+        //가장 마지막 명언글의 번호
+        int num=0;
 
         outer:
         while (true){
@@ -20,8 +21,12 @@ public class App {
                     String content = sc.nextLine().trim();
                     System.out.printf("작가 : ");
                     String author = sc.nextLine().trim();
-                    System.out.println(num+"번 명언이 등록되었습니다.");
-                    num++;
+                    int id = ++num; //명언 글번호 증가
+
+                    WiseSaying ws = new WiseSaying(id, content, author);
+                    System.out.println(ws);
+
+                    System.out.println(id+"번 명언이 등록되었습니다.");
                     break;
 
                 case "종료":
