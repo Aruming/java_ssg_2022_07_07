@@ -3,6 +3,8 @@ package com.ll.exam;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.List;
 import java.util.Map;
 
 public class FileDBTest {
@@ -10,6 +12,19 @@ public class FileDBTest {
     void beforeEach() {
         Util.deleteDir("test_data");
         Util.mkdir("test_data");
+    }
+
+    @Test
+    void 특정_폴더에_존재하는_모든_파일명_가져오기(){
+        Util.saveNumberToFile("test_data/1.txt", 1);
+        Util.saveNumberToFile("test_data/2.txt", 2);
+        Util.saveNumberToFile("test_data/3.txt", 3);
+
+        List<String> fileNames = Util.getFileNamesFromDir("test_data");
+
+        assertEquals("1.txt", fileNames.get(0));
+        assertEquals("2.txt", fileNames.get(1));
+        assertEquals("3.txt", fileNames.get(2));
     }
 
     @Test
