@@ -5,18 +5,22 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 
 public class Util {
     public static void saveToFile(String path, String body) {
-        try(RandomAccessFile stream = new RandomAccessFile(path, "rw");
-            FileChannel channel = stream.getChannel()){
+        try (RandomAccessFile stream = new RandomAccessFile(path, "rw");
+             FileChannel channel = stream.getChannel()) {
             byte[] strBytes = body.getBytes();
             ByteBuffer buffer = ByteBuffer.allocate(strBytes.length);
             buffer.put(strBytes);
             buffer.flip();
             channel.write(buffer);
-        } catch (IOException e){
+        } catch (IOException e) {
 
         }
     }
@@ -27,19 +31,52 @@ public class Util {
     }
 
     public static String readFromFile(String path) {
-        try(RandomAccessFile reader = new RandomAccessFile(path, "r")) {
+        try (RandomAccessFile reader = new RandomAccessFile(path, "r")) {
             String line = null;
             String body = "";
 
-            while((line = reader.readLine()) != null){
-                body += new String(line.getBytes("iso-8859-1"), "utf-8")+"\n";
+            while ((line = reader.readLine()) != null) {
+                body += new String(line.getBytes("iso-8859-1"), "utf-8") + "\n";
             }
 
             return body.trim();
-        }catch(IOException e){
+        } catch (IOException e) {
 
-        };
+        }
+        ;
 
         return "";
+    }
+
+    public static Map<String, Object> jsonToMap(String json) {
+        if (json.isEmpty()) {
+            return null;
+        }
+
+        final String[] jsonBits = json
+                .replaceAll("\\{", "")
+                .replaceAll("\\}", "")
+                .split(",");
+
+        final List<Object> bits = Stream.of(jsonBits)
+                .map(String::trim)
+                .flatMap(bit -> Arrays.stream(bit.split(":")))
+                .map(String::trim)
+                .map(s -> s.startsWith("\"") ? s.substring(1, s.length() - 1) : Integer.parseInt(s))
+                .collect(Collectors.toList());
+
+        Map<String, Object> map = IntStream
+                .range(0, bits.size() / 2)
+                .mapToObj(i -> Pair.of((String) bits.get(i * 2), bits.get(i * 2 + 1)))
+                .collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue(), (key1, key2) -> key1, LinkedHashMap::new));
+
+        return map;
+    }
+}
+
+class Pair {
+    // Return a map entry (key-value pair) from the specified values
+    public static <T, U> Map.Entry<T, U> of(T first, U second) {
+        return new AbstractMap.SimpleEntry<>(first, second);
     }
 }
