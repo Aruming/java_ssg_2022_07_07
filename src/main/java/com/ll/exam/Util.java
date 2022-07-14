@@ -28,9 +28,14 @@ public class Util {
 
     public static String readFromFile(String path) {
         try(RandomAccessFile reader = new RandomAccessFile(path, "r")) {
-            String line = reader.readLine();
+            String line = null;
+            String body = "";
 
-            return new String(line.getBytes("iso-8859-1"), "utf-8");
+            while((line = reader.readLine()) != null){
+                body += new String(line.getBytes("iso-8859-1"), "utf-8")+"\n";
+            }
+
+            return body.trim();
         }catch(IOException e){
 
         };
